@@ -1,0 +1,8 @@
+# OS Files
+.DS_Store
+
+# Idea Intellij
+.idea
+
+#Python
+__pycache__
