@@ -1,14 +1,13 @@
 # Paga Collect Python library
 The Paga Collect API allows anyone to initiate a payment request to a third party and automatically get notified when the payment request is fulfilled. This library makes it easier and faster for developers to integrate the API
 
-<br>
 ### 1. Installation
 Make sure you have `pip` installed, then run the command below
 ```sh
 pip install paga-collect-lib
 ```
 
-<br>
+
 ### 2. Usage
 Once installed to use the library see sample code below:
 ```sh
@@ -21,11 +20,12 @@ hash_key = "hash_key"
 collect = Collect(principal, credentials, hash_key, False)
 ```
 
-<br>
+
 ### Paga Collect API Operations
 Now that you have created a collect api object you easily call its operations
 
 <br>
+
 #### Request Payment
 Register a new request for payment between a payer and a payee. Once a payment request is initiated successfully, the payer is notified by the platform (this can be suppressed) and can proceed to authorize/execute the payment. Once the payment is fulfilled, a notification is sent to the supplied callback URL. See the callback notification section for more details.
 <br>
@@ -60,7 +60,9 @@ response = collect.payment_request(payment_request_payload)
 ```
 
 <br>
+
 #### Register Persistent Payment Account
+
 An operation for business to create Persistent Payment Account Numbers that can be assigned to their customers for payment collection.
 <br>
 To create a persistent payment account see sample code below:
@@ -81,6 +83,7 @@ response = collect.register_persistent_payment_account(register_persistent_payme
 ```
 
 <br>
+
 #### Query Status
 Query the current status of a submitted request
 <br>
@@ -92,6 +95,7 @@ response = collect.get_status(status_payload)
 ```
 
 <br>
+
 #### Query History
 Get payment requests for a period between given start and end dates. The period window should not exceed 1 month.
 <br>
@@ -107,6 +111,7 @@ response = collect.get_history(history_payload)
 ```
 
 <br>
+
 #### Get Banks
 Retrieve a list of supported banks and their complementary unique ids on the bank. This is required for populating the payer (optional) and payee objects in the payment request model.
 <br>
