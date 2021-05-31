@@ -4,14 +4,14 @@ The Paga Collect API allows anyone to initiate a payment request to a third part
 ### 1. Installation
 Make sure you have `pip` installed, then run the command below
 ```sh
-pip install paga-collect-lib
+pip install pagacollect
 ```
 
 
 ### 2. Usage
 Once installed to use the library see sample code below:
 ```sh
-from paga_collect_lib import Collect;
+from pagacollect.paga_collect import Collect
 
 principal = "public_key"
 credentials = "private"

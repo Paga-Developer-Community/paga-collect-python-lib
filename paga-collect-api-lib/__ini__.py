@@ -1,1 +1,0 @@
-from paga_collect_lib import Collect
