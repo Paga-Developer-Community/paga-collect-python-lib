@@ -6,8 +6,7 @@ from base64 import b64encode
 
 
 def _get_basic_auth(client_id, password):
-    base64_string = b64encode(str.encode(client_id + ":" + password)). \
-        decode("ascii")
+    base64_string = b64encode(str.encode(client_id + ":" + password)).decode("ascii")
     return base64_string
 
 
@@ -19,7 +18,7 @@ def generate_hash(hash_params):
           hash_params : string
               A concatenated string of parameters be hashed
     """
-    return hashlib.sha512(str(hash_params).encode("utf-8")).hexdigest().strip()
+    return hashlib.sha512(str(hash_params.strip()).encode("utf-8")).hexdigest().strip()
 
 
 def post_request(headers, json_data, url):
@@ -43,7 +42,7 @@ class Collect(object):
     """
 
     _CONTENT_TYPE = "application/json"
-    test_server = "https://beta.mypaga.com"
+    test_server = "https://beta-collect.paga.com"
     live_Server = "https://collect.paga.com"
 
     def __init__(self, client_id, password, api_key, is_test_env):

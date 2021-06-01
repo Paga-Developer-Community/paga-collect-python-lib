@@ -1,8 +1,6 @@
-# OS Files
-.DS_Store
-
-# Idea Intellij
+build
+dist
+pagacollect.egg-info
 .idea
-
-#Python
+.DS_Store
 __pycache__
