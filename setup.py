@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='pagacollect',
-    version='1.0.3',
+    version='1.0.4',
     license='MIT',
     description='A helper class/SDK to enable developers easily integrate Paga Collect API',
     long_description=long_description,
