@@ -231,8 +231,8 @@ class Collect(object):
         if payload.get("creditBankId"):
             hash_params += payload["creditBankId"]
 
-        if payload.get("creditBankAccount"):
-            hash_params += payload["creditBankAccount"]
+        if payload.get("creditBankAccountNumber"):
+            hash_params += payload["creditBankAccountNumber"]
 
         if payload.get("callbackUrl"):
             hash_params += payload["callbackUrl"]

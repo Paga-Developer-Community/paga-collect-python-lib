@@ -76,6 +76,8 @@ register_persistent_payment_account_payload = {
     "email": "john@doe.com",
     "accountReference": "22222222222220",
     "financialIdentificationNumber": "22182799077",
+    "creditBankId": "3E94C4BC-6F9A-442F-8F1A-8214478D5D86",
+    "creditBankAccountNumber":"0000000000",
     "callbackUrl": "http://localhost:9091/test-callback"
 }
 
