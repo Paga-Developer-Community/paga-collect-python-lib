@@ -36,6 +36,23 @@ def post_request(headers, json_data, url):
     return requests.request(method="POST", url=url, headers=headers, data=json_data)
 
 
+def remove_empty_elements(value):
+    """
+    Recursively remove all None values from dictionaries and lists, and returns
+    the result as a new dictionary or list.
+    """
+    if isinstance(value, list):
+        return [remove_empty_elements(x) for x in value if x is not None]
+    elif isinstance(value, dict):
+        return {
+            key: remove_empty_elements(val)
+            for key, val in value.items()
+            if val is not None
+        }
+    else:
+        return value
+
+
 class Collect(object):
     """
     Base class for paga Collect api library
@@ -105,18 +122,189 @@ class Collect(object):
         """
         endpoint = "/history"
         hash_params = ''
+        url = self.get_url(self.is_test_env)
+        server_url = url + endpoint
 
-        if payload.get("referenceNumber"):
-            hash_params += payload["referenceNumber"]
+       
+
+        data = json.dumps(payload)
+        load_json = json.loads(data)
+
+        
+        hash_json = {
+            "referenceNumber": load_json.get('referenceNumber') or None
+        }
+
+       
+
+        request_data = {
+            "referenceNumber": load_json.get('referenceNumber') or None,
+            "startDateTimeUTC":  load_json.get("startDateTimeUTC"),
+            "endDateTimeUTC":  load_json.get("endDateTimeUTC") or None,
+
+        }
+        hash_data = json.dumps(remove_empty_elements(hash_json)) 
+        hash_params = ''.join(list(json.loads(hash_data).values()))
+        headers = self.build_header(hash_params)
+        json_data = json.dumps(remove_empty_elements(request_data))
+    
+    
+        response = post_request(headers, json_data, server_url)
+        return response.text
+
+    def payment_request_refund(self, payload):
+        """
+        Calls Collect API to cancel or initiate a refund if we were unable to fulfill 
+        the request for one reason or the other
+              ----------
+              payload : json
+                  A request body for the paymentRequestRefund endpoint of the Collect API
+        """
+        endpoint = "/refund"
+        hash_params = ''.join([payload["referenceNumber"], payload["refundAmount"]])
+
 
         url = self.get_url(self.is_test_env)
         server_url = url + endpoint
 
         headers = self.build_header(hash_params)
 
-        json_data = json.dumps(payload)
+        data = json.dumps(payload)
+        load_json = json.loads(data)
+
+        request_data = {
+            "referenceNumber": load_json.get('referenceNumber'),
+            "refundAmount":  load_json.get("refundAmount"),
+            "currency":  load_json.get("currency"),
+            "reason":  load_json.get("reason") or None,
+
+        } 
+        json_data = json.dumps(remove_empty_elements(request_data))
+    
+    
         response = post_request(headers, json_data, server_url)
         return response.text
+    
+
+    def delete_persistent_payment_account(self, payload):
+        """
+        Calls Collect API to delete a persistent payment account. 
+       
+              ----------
+              payload : json
+                  A request body for the deletePersistentPaymentAccount endpoint of the Collect API
+        """
+        endpoint = "/deletePersistentPaymentAccount"
+        hash_params = ''.join([payload["referenceNumber"], payload["accountIdentifier"]])
+
+
+        url = self.get_url(self.is_test_env)
+        server_url = url + endpoint
+
+        headers = self.build_header(hash_params)
+
+        data = json.dumps(payload)
+        load_json = json.loads(data)
+
+        request_data = {
+            "referenceNumber": load_json.get('referenceNumber'),
+            "accountIdentifier":  load_json.get("accountIdentifier"),
+            "reason":  load_json.get("endDateTimeUTC") or None,
+
+        } 
+        json_data = json.dumps(remove_empty_elements(request_data))
+    
+    
+        response = post_request(headers, json_data, server_url)
+        return response.text
+
+    def get_persistent_payment_account(self, payload):
+        """
+        Calls Collect API to to query the properties associated with an existing persistent payment account. 
+       
+              ----------
+              payload : json
+                  A request body for the getPersistentPaymentAccount endpoint of the Collect API
+        """
+        endpoint = "/getPersistentPaymentAccount"
+        hash_params = ''.join([payload["referenceNumber"], payload["accountIdentifier"]])
+
+
+        url = self.get_url(self.is_test_env)
+        server_url = url + endpoint
+
+        headers = self.build_header(hash_params)
+
+        data = json.dumps(payload)
+        load_json = json.loads(data)
+
+        request_data = {
+            "referenceNumber": load_json.get('referenceNumber'),
+            "accountIdentifier":  load_json.get("accountIdentifier"),
+
+        } 
+        json_data = json.dumps(request_data)
+    
+    
+        response = post_request(headers, json_data, server_url)
+        return response.text
+
+
+    def update_persistent_payment_account(self, payload):
+        """
+        This endpoint allows for changing any of the account properties except the accountNumber (NUBAN) and the accounReference properties which cannot be changed. 
+       
+              ----------
+              payload : json
+                  A request body for the updatePersistentPaymentAccount endpoint of the Collect API
+        """
+        endpoint = "/updatePersistentPaymentAccount"
+
+
+        url = self.get_url(self.is_test_env)
+        server_url = url + endpoint
+
+        data = json.dumps(payload)
+        load_json = json.loads(data)
+
+        request_data = {
+            "referenceNumber": load_json.get('referenceNumber'),
+            "accountIdentifier":  load_json.get("accountIdentifier"),
+            "phoneNumber":  load_json.get("phoneNumber") or None,
+            "firstName":  load_json.get("firstName") or None,
+            "lastName":  load_json.get("endDateTimeUTC") or None,
+            "accountName":  load_json.get("lastName") or None,
+            "financialIdentificationNumber":  load_json.get("financialIdentificationNumber") or None,
+            "callbackUrl":  load_json.get("callbackUrl") or None,
+            "creditBankId":  load_json.get("creditBankId") or None,
+            "creditBankAccountNumber":  load_json.get("creditBankAccountNumber") or None,
+
+
+        } 
+
+        hash_json = {
+            "referenceNumber": load_json.get('referenceNumber'),
+            "accountIdentifier":  load_json.get("accountIdentifier"),
+            "financialIdentificationNumber":  load_json.get("financialIdentificationNumber") or None,
+            "creditBankId":  load_json.get("creditBankId") or None,
+            "creditBankAccountNumber":  load_json.get("creditBankAccountNumber") or None,
+            "callbackUrl":  load_json.get("callbackUrl") or None,
+        }
+
+        hash_data = json.dumps(remove_empty_elements(hash_json))
+        hash_params = ''.join(list(json.loads(hash_data).values()))
+        print(hash_params)
+        headers = self.build_header(hash_params)
+        json_data = json.dumps(remove_empty_elements(request_data))
+    
+    
+        response = post_request(headers, json_data, server_url)
+        return response.text
+
+    
+
+
+
 
     def get_status(self, payload):
         """
@@ -170,41 +358,75 @@ class Collect(object):
                   A request body for the paymentRequest endpoint of the Collect API
         """
         endpoint = "/paymentRequest"
-        hash_params = ''
-
-        if payload.get("referenceNumber"):
-            hash_params += payload["referenceNumber"]
-
-        if payload.get("amount"):
-            hash_params += payload["amount"]
-
-        if payload.get("currency"):
-            hash_params += payload["currency"]
-
-        if payload.get("payer").get("phoneNumber"):
-            hash_params += payload["payer"]["phoneNumber"]
-
-        if payload.get("payer").get("email"):
-            hash_params += payload["payer"]["email"]
-
-        if payload.get("payee").get("accountNumber"):
-            hash_params += payload["payee"]["accountNumber"]
-
-        if payload.get("payee").get("phoneNumber"):
-            hash_params += payload["payee"]["phoneNumber"]
-
-        if payload.get("payee").get("bankId"):
-            hash_params += payload["payee"]["bankId"]
-
-        if payload.get("payee").get("bankAccountNumber"):
-            hash_params += payload["payee"]["bankAccountNumber"]
 
         url = self.get_url(self.is_test_env)
         server_url = url + endpoint
+        data = json.dumps(payload)
+        load_json = json.loads(data)
 
+        payee = {
+            "name": load_json.get("payee").get("name"),
+            "accountNumber": load_json.get("payee").get("accountNumber") or None,
+            "phoneNumber": load_json.get("payee").get("phoneNumber") or None,
+            "bankId": load_json.get("payee").get("bankId") or None,
+            "bankAccountNumber": load_json.get("payee").get("bankAccountNumber") or None,
+            "financialIdentificationNumber": load_json.get("payee").get("financialIdentificationNumber") or None,
+
+        }
+
+        payer = {
+            "name": load_json.get("payer").get("name"),
+            "phoneNumber": load_json.get("payer").get("phoneNumber") or None,
+            "email": load_json.get("payer").get("email") or None,
+            "bankId": load_json.get("payee").get("bankId") or None,
+        }
+
+        payment_request_payload = {
+            "referenceNumber": load_json.get("referenceNumber"),
+            "amount": str(load_json.get("amount")),
+            "currency": load_json.get("currency"),
+            "payer": payer,
+            "payee": payee,
+            "expiryDateTimeUTC": load_json.get("expiryDateTimeUTC") or None,
+            "isSuppressMessages": load_json.get("isSuppressMessages"),
+            "payerCollectionFeeShare": load_json.get("payerCollectionFeeShare"),
+            "payeeCollectionFeeShare": load_json.get("payeeCollectionFeeShare"),
+            "isAllowPartialPayments": load_json.get("isAllowPartialPayments") or None,
+            "callBackUrl": load_json.get("callBackUrl"),
+            "paymentMethods": load_json.get("paymentMethods"),
+            "displayBankDetailToPayer": load_json.get("displayBankDetailToPayer") or None
+        }
+
+        request_hash = {
+            "referenceNumber": load_json.get("referenceNumber"),
+            "amount": str(load_json.get("amount")),
+            "currency": load_json.get("currency"),
+        }
+
+        payee_hash = {
+            "accountNumber": load_json.get("payee").get("accountNumber") or None,
+            "phoneNumber": load_json.get("payee").get("phoneNumber") or None,
+            "bankId": load_json.get("payee").get("bankId") or None,
+            "bankAccountNumber": load_json.get("payee").get("bankAccountNumber") or None,
+
+        }
+
+
+        payer_hash = {
+            "phoneNumber": load_json.get("payer").get("phoneNumber") or None,
+            "email": load_json.get("payer").get("email") or None,
+        }
+        
+        payee_hash_data = json.dumps(remove_empty_elements(payee_hash))
+        request_hash_data = json.dumps(request_hash)
+
+        payer_hash_data = json.dumps(remove_empty_elements(payer_hash))
+        hash_params = ''.join(list(json.loads(request_hash_data).values())) + ''.join(list(json.loads(payer_hash_data).values())) + ''.join(list(json.loads(payee_hash_data).values()))
+        print(hash_params)
         headers = self.build_header(hash_params)
-
-        json_data = json.dumps(payload)
+        json_data = json.dumps(remove_empty_elements(payment_request_payload))
+    
+    
         response = post_request(headers, json_data, server_url)
         return response.text
 
@@ -217,31 +439,41 @@ class Collect(object):
                   A request body for the register payment persistent account endpoint of the Collect API
         """
         endpoint = "/registerPersistentPaymentAccount"
-        hash_params = ''
-
-        if payload.get("referenceNumber"):
-            hash_params += payload["referenceNumber"]
-
-        if payload.get("accountReference"):
-            hash_params += payload["accountReference"]
-
-        if payload.get("financialIdentificationNumber"):
-            hash_params += payload["financialIdentificationNumber"]
-
-        if payload.get("creditBankId"):
-            hash_params += payload["creditBankId"]
-
-        if payload.get("creditBankAccountNumber"):
-            hash_params += payload["creditBankAccountNumber"]
-
-        if payload.get("callbackUrl"):
-            hash_params += payload["callbackUrl"]
-
         url = self.get_url(self.is_test_env)
         server_url = url + endpoint
 
-        headers = self.build_header(hash_params)
+        data = json.dumps(payload)
+        load_json = json.loads(data)
 
-        json_data = json.dumps(payload)
+        request_data = {
+            "referenceNumber": load_json.get("referenceNumber"),
+            "phoneNumber": load_json.get("phoneNumber"),
+            "firstName": load_json.get("firstName"),
+            "lastName": load_json.get("lastName") or None,
+            "accountName": load_json.get("accountName"),
+            "email": load_json.get("email"),
+            "financialIdentificationNumber": load_json.get("financialIdentificationNumber") or None,
+            "accountReference": load_json.get("accountReference"),
+            "creditBankId": load_json.get("creditBankId") or None,
+            "creditBankAccountNumber": load_json.get("creditBankAccountNumber") or None,
+            "callbackUrl": load_json.get("callbackUrl") or None,
+        }
+
+        hash_json = {
+            "referenceNumber": load_json.get("referenceNumber"),
+            "accountReference": load_json.get("accountReference"),
+            "financialIdentificationNumber": load_json.get("financialIdentificationNumber") or None,
+            "creditBankId": load_json.get("creditBankId") or None,
+            "creditBankAccountNumber": load_json.get("creditBankAccountNumber") or None,
+            "callbackUrl": load_json.get("callbackUrl") or None,
+        }
+
+        hash_data = json.dumps(remove_empty_elements(hash_json))
+        hash_params = ''.join(list(json.loads(hash_data).values()))
+        headers = self.build_header(hash_params)
+        json_data = json.dumps(remove_empty_elements(request_data))
+    
+    
         response = post_request(headers, json_data, server_url)
         return response.text
+
